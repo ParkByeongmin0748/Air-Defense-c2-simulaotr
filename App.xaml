@@ -1,9 +1,150 @@
 ﻿<Application x:Class="AirDefenseC2.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:AirDefenseC2"
+             xmlns:conv="clr-namespace:AirDefenseC2.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <!-- ===== 색상 ===== -->
+        <SolidColorBrush x:Key="WindowBg" Color="#0E1511"/>
+        <SolidColorBrush x:Key="PanelBg" Color="#14201A"/>
+        <SolidColorBrush x:Key="PanelBorder" Color="#294335"/>
+        <SolidColorBrush x:Key="TitleBrush" Color="#77BC8B"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#D5E8D8"/>
+        <SolidColorBrush x:Key="DimBrush" Color="#739987"/>
+        <SolidColorBrush x:Key="GreenBrush" Color="#65E891"/>
+        <SolidColorBrush x:Key="AmberBrush" Color="#FFBE45"/>
+        <SolidColorBrush x:Key="RedBrush" Color="#FF6258"/>
+        <SolidColorBrush x:Key="FriendlyBrush" Color="#4FC3F7"/>
+        <SolidColorBrush x:Key="SelectBrush" Color="#FFE45C"/>
+        <SolidColorBrush x:Key="RowSelectedBg" Color="#2A4536"/>
+        <SolidColorBrush x:Key="RowHoverBg" Color="#1C2E24"/>
+
+        <!-- ===== 컨버터 ===== -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:KmToCanvasConverter x:Key="KmToCanvas"/>
+        <conv:TrailToPointsConverter x:Key="TrailToPoints"/>
+        <conv:ThreatToBrushConverter x:Key="ThreatBrush"/>
+        <conv:TargetStatusToBrushConverter x:Key="StatusBrush"/>
+        <conv:LauncherStatusToBrushConverter x:Key="LauncherBrush"/>
+        <conv:LogLevelToBrushConverter x:Key="LogBrush"/>
+        <conv:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
+
+        <!-- ===== 스타일 ===== -->
+        <Style x:Key="PanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelBg}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PanelBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+
+        <Style x:Key="PanelTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TitleBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="DimText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource DimBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+
+        <Style x:Key="DarkButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Background" Value="#1A2A21"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PanelBorder}"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#243A2E"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#2F4D3C"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkToggle" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{StaticResource DimBrush}"/>
+            <Setter Property="Background" Value="#1A2A21"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PanelBorder}"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#65E891"/>
+                                <Setter Property="Foreground" Value="#65E891"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#243A2E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 목록 항목 (표적 리스트 / 로그) -->
+        <Style x:Key="DarkListItem" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="Transparent" BorderBrush="Transparent"
+                                BorderThickness="3,0,0,0" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource RowHoverBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource RowSelectedBg}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SelectBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkListBox" TargetType="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkListItem}"/>
+        </Style>
+
     </Application.Resources>
 </Application>
